@@ -24,8 +24,53 @@ $(window).scroll(function () {
     mouse_tracking_scroll_stamp.scrollY = c_top;
     mouse_tracking_pos_stamp.x = new_x;
     mouse_tracking_pos_stamp.y = new_y;
-    send_mouse_info(formInfo("SCROLL", message));
+    //send_mouse_info(formInfo("SCROLL", message));
 });
+
+
+
+$(function(){
+    $('a')
+        .hover(function(){
+            base_link_message($(this).get(0), "HOVER", "anchor");
+        })
+        
+});
+
+$(function(){
+    $('a')
+        .click(function(){
+            base_link_message($(this).get(0), "CLICK", "anchor");
+        })
+        
+});
+
+$(function(){
+    $('img')
+        .hover(function(){
+            base_link_message($(this).get(0), "HOVER", "image");
+        })
+});
+
+$(function(){
+    $('img')
+        .click(function(){
+            base_link_message($(this).get(0), "CLICK", "image");
+        })
+});
+
+function base_link_message(link_obj, action_info, target_info){
+    var message = "type=" + target_info;
+    var cur_pos = getMousePos();
+    message = message + "\tx=" + cur_pos.x + "\ty=" + cur_pos.y;
+    if(link_obj.href == undefined){
+        message = message + "\tsrc=" + link_obj.src;
+    }else{
+        message = message + "\tsrc=" + link_obj.href;
+    }
+    send_mouse_info(formInfo(action_info, message));
+}
+
 
 function log_mouse_tracking(ev){
     var new_time_stamp = (new Date()).getTime();
@@ -38,7 +83,7 @@ function log_mouse_tracking(ev){
         return;
     }
     var info = "FROM\tx=" + mouse_tracking_pos_stamp.x + "\ty=" + mouse_tracking_pos_stamp.y + "\tTO\tx=" +cur_pos.x + "\ty=" + cur_pos.y + "\ttime=" + time_interval + "\tstart=" + time_start + "\tend="+ time_end;
-    send_mouse_info(formInfo("MOUSE_MOVE", info));
+    //send_mouse_info(formInfo("MOUSE_MOVE", info));
     mouse_tracking_time_stamp = new_time_stamp;
     mouse_tracking_pos_stamp = cur_pos;
 }
@@ -76,8 +121,9 @@ function getMousePos(ev) {
 
 function formInfo(action_info, log_str){
     var time_str = time_info();
+    var abs_time_str = (new Date()).getTime();
     //var info =  "TIME=" + time_str + "\t" + "USER=" + studentID + "\t" + "QUERY=" + currentQueryID + "\t" + "ACTION=" + action_info + "\t" + "INFO:\t" + log_str + "\n";
-    var info =  "TIME=" + time_str + "\t" + "ACTION=" + action_info + "\t" + "INFO:\t" + log_str + "\n";
+    var info =  "ABS_TIME=" + abs_time_str + "\t" + "TIME=" + time_str + "\t" + "ACTION=" + action_info + "\t" + "INFO:\t" + log_str + "\n";
     //console.log(info);
     return info;
 }
