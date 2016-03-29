@@ -29,49 +29,6 @@ $(window).scroll(function () {
 
 
 
-$(function(){
-    $('a')
-        .hover(function(){
-            base_link_message($(this).get(0), "HOVER", "anchor");
-        })
-        
-});
-
-$(function(){
-    $('a')
-        .click(function(){
-            base_link_message($(this).get(0), "CLICK", "anchor");
-        })
-        
-});
-
-$(function(){
-    $('img')
-        .hover(function(){
-            base_link_message($(this).get(0), "HOVER", "image");
-        })
-});
-
-$(function(){
-    $('img')
-        .click(function(){
-            base_link_message($(this).get(0), "CLICK", "image");
-        })
-});
-
-function base_link_message(link_obj, action_info, target_info){
-    var message = "type=" + target_info;
-    var cur_pos = getMousePos();
-    message = message + "\tx=" + cur_pos.x + "\ty=" + cur_pos.y;
-    if(link_obj.href == undefined){
-        message = message + "\tsrc=" + link_obj.src;
-    }else{
-        message = message + "\tsrc=" + link_obj.href;
-    }
-    send_mouse_info(formInfo(action_info, message));
-}
-
-
 function log_mouse_tracking(ev){
     var new_time_stamp = (new Date()).getTime();
     var cur_pos = getMousePos(ev);

@@ -9,6 +9,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
 });
 
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+
+    if(tab.url.match(/https:\/\/s.taobao.com\/*/)){
+        if(changeInfo.status == "complete") {
+            chrome.tabs.executeScript(null, {file: "content_link.js"});
+        }
+    }
+    else{
+        chrome.tabs.executeScript(null, {file: "content_link.js"});
+    }
+
+});
+
 function send_mouse_info(info){
     mouse_tracking_info = mouse_tracking_info + info;
     mouse_tracking_count ++;
