@@ -11,7 +11,28 @@ var mouse_tracking_least_move_distance = 20;//px
 
 
 document.onmousemove = log_mouse_tracking;
-send_mouse_info(formInfo("BEGIN_SEARCH", ""));
+send_mouse_info(formInfo("PAGE_START", ""));
+
+var isTargetWindow = true;
+$(window).focus(function() {
+   isTargetWindow = true;
+   send_mouse_info(formInfo("JUMP_IN", ""));
+   mouse_tracking_time_stamp = (new Date()).getTime();
+});
+
+$(window).blur(function() {
+   if(isTargetWindow)
+   {
+        send_mouse_info(formInfo("JUMP_OUT", ""));
+        isTargetWindow = false;
+   }
+});
+
+window.onbeforeunload = function (e){
+    
+    send_mouse_info(formInfo("PAGE_END", ""));
+    //return '';
+};
 
 
 $(window).scroll(function () {
@@ -24,7 +45,7 @@ $(window).scroll(function () {
     mouse_tracking_scroll_stamp.scrollY = c_top;
     mouse_tracking_pos_stamp.x = new_x;
     mouse_tracking_pos_stamp.y = new_y;
-    //send_mouse_info(formInfo("SCROLL", message));
+    send_mouse_info(formInfo("SCROLL", message));
 });
 
 
@@ -40,7 +61,7 @@ function log_mouse_tracking(ev){
         return;
     }
     var info = "FROM\tx=" + mouse_tracking_pos_stamp.x + "\ty=" + mouse_tracking_pos_stamp.y + "\tTO\tx=" +cur_pos.x + "\ty=" + cur_pos.y + "\ttime=" + time_interval + "\tstart=" + time_start + "\tend="+ time_end;
-    //send_mouse_info(formInfo("MOUSE_MOVE", info));
+    send_mouse_info(formInfo("MOUSE_MOVE", info));
     mouse_tracking_time_stamp = new_time_stamp;
     mouse_tracking_pos_stamp = cur_pos;
 }

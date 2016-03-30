@@ -7,7 +7,8 @@
     
     "permissions":[
         "tabs",
-        "https://*.taobao.com/*"
+        "https://*.taobao.com/*",
+        "https://*.tmall.com/*"
     ],
     
     "background": {
@@ -22,7 +23,7 @@
     
     "content_scripts": [
     {
-      "matches": ["https://*.taobao.com/*"],
+      "matches": ["https://*.taobao.com/*", "https://*.tmall.com/*"],
       "js": ["jquery-1.12.1.min.js", "content.js"],
       "run_at": "document_end"
     }
