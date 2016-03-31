@@ -1,19 +1,18 @@
 $(function(){
-    $('a')
-        .hover(function(){
-            base_link_message($(this).get(0), "HOVER");
-        })
-        
-});
+    if (!content_link_binded) {
+        $('a')
+            .hover(function(){
+                base_link_message($(this).get(0), "HOVER");
+            })
 
-$(function(){
-    $('a')
+        $('a')
         .click(function(){
             base_link_message($(this).get(0), "CLICK");
         })
-        
-});
 
+        content_link_binded = true;
+    }
+});
 
 
 function base_link_message(link_obj, action_info){
