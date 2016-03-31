@@ -44,6 +44,18 @@ function send_mouse_info(info){
 }
 
 function ajax_log_message(log_str){
-	console.log(log_str);
+    //console.log(log_str);
+    server_site = "127.0.0.1"
+    var encode_str = encodeURIComponent(log_str);
+    //alert(encode_str + "\n");
+    var log_url = "http://" + server_site + ":8000/log_process";
+    $.ajax({
+        type:'POST',
+        url:log_url,
+        data:{message:encode_str},
+        complete: function (jqXHR, textStatus) {
+            //alert(textStatus + "----" + jqXHR.status + "----" + jqXHR.readyState);
+        }
+    });
 
 }

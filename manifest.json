@@ -8,11 +8,12 @@
     "permissions":[
         "tabs",
         "https://*.taobao.com/*",
-        "https://*.tmall.com/*"
+        "https://*.tmall.com/*",
+        "https://127.0.0.1/*"
     ],
     
     "background": {
-    "scripts": ["background.js"],
+    "scripts": ["jquery-1.12.1.min.js","background.js"],
     "persistent": true
   },
     
