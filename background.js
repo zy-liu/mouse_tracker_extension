@@ -11,6 +11,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 
 });
 
+
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
     if(tab.url.match(/https:\/\/.*\.taobao\.com\/*/)){
         if(tab.url.match(/https:\/\/s\.taobao\.com\/*/)){
@@ -21,9 +22,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
         else{
             chrome.tabs.executeScript(null, {file: "content_link.js"});
         }
+    } else {
+        chrome.tabs.executeScript(null, {file: "content_link.js"});
     }
-    else
-        console.log("Error!@ " + tab.url);
 
 });
 
