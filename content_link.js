@@ -1,17 +1,21 @@
 $(function(){
-    if (!content_link_binded) {
         $('a')
             .hover(function(){
-                base_link_message($(this).get(0), "HOVER");
+                if($(this).hasClass('thuir_hover') == false)
+                {
+                    $(this).addClass('thuir_hover');
+                    //base_link_message($(this).get(0), "HOVER");
+                }
             })
 
         $('a')
-        .click(function(){
-            base_link_message($(this).get(0), "CLICK");
-        })
-
-        content_link_binded = true;
-    }
+            .click(function(){
+                if($(this).hasClass('thuir_click') == false)
+                {   
+                    $(this).addClass('thuir_click');
+                    base_link_message($(this).get(0), "CLICK");
+                }
+            })
 });
 
 

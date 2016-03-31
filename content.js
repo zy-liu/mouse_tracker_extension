@@ -9,7 +9,6 @@ var mouse_tracking_scroll_stamp = {'scrollX':0, 'scrollY':0};
 var mouse_tracking_least_move_interval = 20;//ms
 var mouse_tracking_least_move_distance = 20;//px
 
-var content_link_binded = false;
 
 document.onmousemove = log_mouse_tracking;
 send_mouse_info(formInfo("PAGE_START", ""));

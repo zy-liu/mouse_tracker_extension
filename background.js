@@ -6,33 +6,30 @@ var current_url = "";
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     current_url = sender.tab.url;
-    info = "SITE=" + current_url + '\t' + request.mouse_log;
+    info = request.mouse_log + '\t' + "SITE=" + current_url;
     send_mouse_info(info);
 
 });
 
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-    if(tab.url.match(/https:\/\/.*\.taobao\.com\/*/)){
-        if(tab.url.match(/https:\/\/s\.taobao\.com\/*/)){
-            if(changeInfo.status == "complete") {
-                chrome.tabs.executeScript(null, {file: "content_link.js"});
-            }
-        }
-        else{
+    
+    if(tab.url.match(/https:\/\/s\.taobao\.com\/*/)){
+        if(changeInfo.status == "complete") {
             chrome.tabs.executeScript(null, {file: "content_link.js"});
         }
-    } else {
+    }
+    else{
         chrome.tabs.executeScript(null, {file: "content_link.js"});
     }
 
 });
 
-chrome.tabs.onActivated.addListener(function(activeInfo){
-        chrome.tabs.query({active: true,lastFocusedWindow: true}, function(tab){
-            var active_url = tab[0].url;
-        });
-    });
+//chrome.tabs.onActivated.addListener(function(activeInfo){
+        //chrome.tabs.query({active: true,lastFocusedWindow: true}, function(tab){
+            //var active_url = tab[0].url;
+        //});
+    //});
 
 function send_mouse_info(info){
     mouse_tracking_info = mouse_tracking_info + info;
@@ -45,18 +42,7 @@ function send_mouse_info(info){
 }
 
 function ajax_log_message(log_str){
-    //console.log(log_str);
-    server_site = "127.0.0.1"
-    var encode_str = encodeURIComponent(log_str);
-    //alert(encode_str + "\n");
-    var log_url = "http://" + server_site + ":8000/log_process";
-    $.ajax({
-        type:'POST',
-        url:log_url,
-        data:{message:encode_str},
-        complete: function (jqXHR, textStatus) {
-            //alert(textStatus + "----" + jqXHR.status + "----" + jqXHR.readyState);
-        }
-    });
+    console.log(log_str);
+    
 
 }
