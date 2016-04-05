@@ -6,7 +6,7 @@ var current_url = "";
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     current_url = sender.tab.url;
-    info = request.mouse_log + '\t' + "SITE=" + current_url;
+    info = String(request.mouse_log).trim() + '\t' + "SITE=" + current_url;
     send_mouse_info(info);
 
 });

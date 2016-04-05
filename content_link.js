@@ -4,7 +4,7 @@ $(function(){
                 if($(this).hasClass('thuir_hover') == false)
                 {
                     $(this).addClass('thuir_hover');
-                    //base_link_message($(this).get(0), "HOVER");
+                    base_link_message($(this).get(0), "HOVER");
                 }
             })
 
