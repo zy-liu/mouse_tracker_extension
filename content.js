@@ -11,26 +11,26 @@ var mouse_tracking_least_move_distance = 20;//px
 
 
 document.onmousemove = log_mouse_tracking;
-send_mouse_info(formInfo("PAGE_START", ""));
+send_mouse_info(formInfo("PAGE_START", {}));
 
 var isTargetWindow = true;
 $(window).focus(function() {
    isTargetWindow = true;
-   send_mouse_info(formInfo("JUMP_IN", ""));
+   send_mouse_info(formInfo("JUMP_IN", {}));
    mouse_tracking_time_stamp = (new Date()).getTime();
 });
 
 $(window).blur(function() {
    if(isTargetWindow)
    {
-        send_mouse_info(formInfo("JUMP_OUT", ""));
+        send_mouse_info(formInfo("JUMP_OUT", {}));
         isTargetWindow = false;
    }
 });
 
 window.onbeforeunload = function (e){
     
-    send_mouse_info(formInfo("PAGE_END", ""));
+    send_mouse_info(formInfo("PAGE_END", {}));
     //return '';
 };
 
@@ -40,7 +40,10 @@ $(window).scroll(function () {
     var c_top = $(this).scrollTop();
     var new_x = mouse_tracking_pos_stamp.x + c_left - mouse_tracking_scroll_stamp.scrollX;
     var new_y = mouse_tracking_pos_stamp.y + c_top - mouse_tracking_scroll_stamp.scrollY;
-    var message = "FROM\t" + "x=" + mouse_tracking_pos_stamp.x + "\ty=" + mouse_tracking_pos_stamp.y + "\tTO\tx=" + new_x + "\t" + "y=" + new_y;
+    var message = {};
+    message.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y};
+    message.to = {x: new_x, y: new_y};
+
     mouse_tracking_scroll_stamp.scrollX = c_left;
     mouse_tracking_scroll_stamp.scrollY = c_top;
     mouse_tracking_pos_stamp.x = new_x;
@@ -51,6 +54,7 @@ $(window).scroll(function () {
 
 
 function log_mouse_tracking(ev){
+    
     var new_time_stamp = (new Date()).getTime();
     var cur_pos = getMousePos(ev);
     var time_interval = new_time_stamp - mouse_tracking_time_stamp;
@@ -60,7 +64,15 @@ function log_mouse_tracking(ev){
     if(time_interval < mouse_tracking_least_move_interval || abs_pos_distance < mouse_tracking_least_move_distance){
         return;
     }
-    var info = "FROM\tx=" + mouse_tracking_pos_stamp.x + "\ty=" + mouse_tracking_pos_stamp.y + "\tTO\tx=" +cur_pos.x + "\ty=" + cur_pos.y + "\ttime=" + time_interval + "\tstart=" + time_start + "\tend="+ time_end;
+    
+    var info = {}
+    info.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y}
+    info.to = {x: cur_pos.x, y: cur_pos.y};
+    info.time = time_interval;
+    info.start_time = time_start;
+    info.end_time = time_end;
+    //"FROM\tx=" +  + "\ty=" +  + "\tTO\tx=" +cur_pos.x + "\ty=" + cur_pos.y + "\ttime=" + time_interval + "\tstart=" + time_start + "\tend="+ time_end;
+    
     send_mouse_info(formInfo("MOUSE_MOVE", info));
     mouse_tracking_time_stamp = new_time_stamp;
     mouse_tracking_pos_stamp = cur_pos;
@@ -97,11 +109,15 @@ function getMousePos(ev) {
     return { 'x': x, 'y': y };
 }
 
-function formInfo(action_info, log_str){
+function formInfo(action_info, log_obj){
+    var obj = {};
+    obj.action = action_info;
+    obj.info = log_obj;
+    
     var time_str = time_info();
     var abs_time_str = (new Date()).getTime();
-    //var info =  "TIME=" + time_str + "\t" + "USER=" + studentID + "\t" + "QUERY=" + currentQueryID + "\t" + "ACTION=" + action_info + "\t" + "INFO:\t" + log_str + "\n";
-    var info =  "ABS_TIME=" + abs_time_str + "\t" + "TIME=" + time_str + "\t" + "ACTION=" + action_info + "\t" + "INFO:\t" + log_str + "\n";
+    obj.time = time_str;
+    obj.abs_time = abs_time_str;
     //console.log(info);
-    return info;
+    return obj;
 }
