@@ -19,6 +19,8 @@ $(function(){
 });
 
 
+
+
 function base_link_message(link_obj, action_info){
     var message = {};
     var cur_pos = getMousePos();

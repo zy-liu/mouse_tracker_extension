@@ -9,9 +9,51 @@ var mouse_tracking_scroll_stamp = {'scrollX':0, 'scrollY':0};
 var mouse_tracking_least_move_interval = 20;//ms
 var mouse_tracking_least_move_distance = 20;//px
 
+var mouse_tracking_scroll_distance_treshold = 60;//px
+var mouse_tracking_scroll_distance = 0;//px
 
-document.onmousemove = log_mouse_tracking;
-send_mouse_info(formInfo("PAGE_START", {}));
+
+$(function () {
+    var inputs = $('form[name="thuir_extension_api"] input');
+    var data = {};
+    inputs.each(function (i, obj) {
+       data[obj.name] = $(obj).val();
+    });
+    if (data.action_info == 'SEARCH_BEGIN') {
+        send_mouse_info(formInfo("SEARCH_BEGIN", {user: data.user, task_url: data.task_url}));
+    }
+    if (data.action_info == 'SEARCH_END') {
+        send_mouse_info(formInfo("SEARCH_END", {user: data.user, task_url: data.task_url}));
+        return;
+    }
+   
+    var visible_elements = [];
+    $(':visible').each(
+        function (idx, e) {
+            var rect = e.getBoundingClientRect();
+            var box = {
+                left: rect.left,
+                top: rect.top,
+                right: rect.right,
+                bottom: rect.bottom,
+                text: e.innerText,
+            };
+            visible_elements.push(box);
+        }
+    );
+           
+    send_mouse_info(
+        formInfo(
+            "PAGE_START", 
+            {
+                html: document.documentElement.outerHTML, 
+                visible_elements: visible_elements
+            }
+        )
+    );
+    
+});
+
 
 var isTargetWindow = true;
 $(window).focus(function() {
@@ -28,8 +70,7 @@ $(window).blur(function() {
    }
 });
 
-window.onbeforeunload = function (e){
-    
+window.onbeforeunload = function (e) {
     send_mouse_info(formInfo("PAGE_END", {}));
     //return '';
 };
@@ -38,8 +79,11 @@ window.onbeforeunload = function (e){
 $(window).scroll(function () {
     var c_left = $(this).scrollLeft();
     var c_top = $(this).scrollTop();
-    var new_x = mouse_tracking_pos_stamp.x + c_left - mouse_tracking_scroll_stamp.scrollX;
-    var new_y = mouse_tracking_pos_stamp.y + c_top - mouse_tracking_scroll_stamp.scrollY;
+    var dx = c_left - mouse_tracking_scroll_stamp.scrollX;
+    var new_x = mouse_tracking_pos_stamp.x + dx;
+    var dy = c_top - mouse_tracking_scroll_stamp.scrollY;
+    var new_y = mouse_tracking_pos_stamp.y + dy;
+    
     var message = {};
     message.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y};
     message.to = {x: new_x, y: new_y};
@@ -48,11 +92,16 @@ $(window).scroll(function () {
     mouse_tracking_scroll_stamp.scrollY = c_top;
     mouse_tracking_pos_stamp.x = new_x;
     mouse_tracking_pos_stamp.y = new_y;
-    send_mouse_info(formInfo("SCROLL", message));
+    
+    
+
+
+        send_mouse_info(formInfo("SCROLL", message));
+
 });
 
 
-
+document.onmousemove = log_mouse_tracking;
 function log_mouse_tracking(ev){
     
     var new_time_stamp = (new Date()).getTime();
@@ -65,15 +114,15 @@ function log_mouse_tracking(ev){
         return;
     }
     
-    var info = {}
-    info.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y}
-    info.to = {x: cur_pos.x, y: cur_pos.y};
-    info.time = time_interval;
-    info.start_time = time_start;
-    info.end_time = time_end;
+    var message = {}
+    message.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y}
+    message.to = {x: cur_pos.x, y: cur_pos.y};
+    message.time = time_interval;
+    message.start_time = time_start;
+    message.end_time = time_end;
     //"FROM\tx=" +  + "\ty=" +  + "\tTO\tx=" +cur_pos.x + "\ty=" + cur_pos.y + "\ttime=" + time_interval + "\tstart=" + time_start + "\tend="+ time_end;
     
-    send_mouse_info(formInfo("MOUSE_MOVE", info));
+    send_mouse_info(formInfo("MOUSE_MOVE", message));
     mouse_tracking_time_stamp = new_time_stamp;
     mouse_tracking_pos_stamp = cur_pos;
 }
@@ -112,7 +161,7 @@ function getMousePos(ev) {
 function formInfo(action_info, log_obj){
     var obj = {};
     obj.action = action_info;
-    obj.info = log_obj;
+    obj.message = log_obj;
     
     var time_str = time_info();
     var abs_time_str = (new Date()).getTime();
