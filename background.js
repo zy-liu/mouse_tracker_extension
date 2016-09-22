@@ -1,4 +1,4 @@
-var mouse_tracking_group_limit = 100;
+var mouse_tracking_group_limit = 1;
 var mouse_tracking_info_list = [];
 var current_url = "";
 var user = "default_user";
@@ -7,14 +7,59 @@ var task_url = "default_task_url";
 var page_actions = ['SEARCH_BEGIN', 'SEARCH_END', 'PAGE_START', 'PAGE_END', 'JUMP_IN', 'JUMP_OUT'];
 var click_actions = ['CLICK', 'HOVER'];
 var mouse_actions = ['MOUSE_MOVE', 'SCROLL'];
-var output_actions = click_actions + mouse_actions;
+var annotation_actions = ['USEFULNESS_ANNOTATION'];
+var output_actions = annotation_actions;
 
+/*
+Context Menu
+ */
+function radioOnClick(c_info, tab) {
+    var info = formInfo(
+        "USEFULNESS_ANNOTATION",
+        {
+            checked_item: c_info.meunItemId,
+            previous_checked_item: c_info.wasChecked,
+        });
+    info.site = tab.url;
+    send_mouse_info(info)
+}
+var parent = chrome.contextMenus.create({"title": "Usefulness Annotation"});
+var l_1 = chrome.contextMenus.create({
+    "title": "Not useful at all",
+    "type": "radio",
+    "parentId": parent,
+    "onclick": radioOnClick,
+});
+var l_2 = chrome.contextMenus.create({
+    "title": "Somewhat useful",
+    "type": "radio",
+    "parentId": parent,
+    "onclick": radioOnClick,
+});
+var l_3 = chrome.contextMenus.create({
+    "title": "Fairly useful",
+    "type": "radio",
+    "parentId": parent,
+    "onclick": radioOnClick,
+});
+var l_4 = chrome.contextMenus.create({
+    "title": "very useful",
+    "type": "radio",
+    "parentId": parent,
+    "onclick": radioOnClick,
+});
 
+/*
+Receive Message from content scripts
+ */
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
     current_url = sender.tab.url;
     var info = request.mouse_log;
     info.site = current_url;
 
+    /*
+    Process different actions
+     */
     if (info.action == 'PAGE_START') {
         var details = {};
         details.tabId = sender.tab.id;
@@ -27,10 +72,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         });
     }
 
+    /*
+    Add to sending queue
+     */
     send_mouse_info(info);
 });
 
 
+/*
+Execute click recording when page is updated
+ */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
     
     
@@ -51,6 +102,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
         //});
     //});
 
+/*
+Add info object to sending queue
+ */
 function send_mouse_info(info) {
    
     if (info.action == 'SEARCH_BEGIN') {
@@ -84,14 +138,19 @@ function send_mouse_info(info) {
 }
 
 
+/*
+Send sending queue to server
+ */
 function ajax_log_message(info_list) {
    //alert(encode_str + "\n");
-    var log_url = "http://127.0.0.1:8000/log_process/";
+    var log_url = "http://127.0.0.1:8000/extension_log/log/";
+    var log_url = "http://10.129.248.120:8000/extension_log/log/";
     $.ajax({
-       type:'POST',
-        url:log_url,
-        data:{
-            mouse_info: info_list
+        type: 'POST',
+        dataType: 'json',
+        url: log_url,
+        data: {
+            mouse_info: JSON.stringify(info_list)
         },
         complete: function (jqXHR, textStatus) {
             //alert(textStatus + "----" + jqXHR.status + "----" + jqXHR.readyState);

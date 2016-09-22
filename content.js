@@ -2,7 +2,7 @@ var current_page_url = window.location.href;
 var mouse_tracking_info = "";
 //var mouse_tracking_count = 0;
 //var mouse_tracking_group_limit = 100;
-var mouse_tracking_baseline_stamp = (new Date()).getTime();
+mouse_tracking_baseline_stamp = (new Date()).getTime();
 var mouse_tracking_time_stamp = mouse_tracking_baseline_stamp;
 var mouse_tracking_pos_stamp = { 'x': 0, 'y': 0 };
 var mouse_tracking_scroll_stamp = {'scrollX':0, 'scrollY':0};
@@ -46,8 +46,8 @@ $(function () {
         formInfo(
             "PAGE_START", 
             {
-                html: document.documentElement.outerHTML, 
-                visible_elements: visible_elements
+                html: document.documentElement.innerHTML, 
+                visible_elements: visible_elements,
             }
         )
     );
@@ -92,11 +92,8 @@ $(window).scroll(function () {
     mouse_tracking_scroll_stamp.scrollY = c_top;
     mouse_tracking_pos_stamp.x = new_x;
     mouse_tracking_pos_stamp.y = new_y;
-    
-    
 
-
-        send_mouse_info(formInfo("SCROLL", message));
+    send_mouse_info(formInfo("SCROLL", message));
 
 });
 
@@ -127,11 +124,7 @@ function log_mouse_tracking(ev){
     mouse_tracking_pos_stamp = cur_pos;
 }
 
-function time_info(){
-    var new_time_stamp = (new Date()).getTime();
-    var time_point = new_time_stamp - mouse_tracking_baseline_stamp;
-    return time_point;
-}
+
 
 function send_mouse_info(info){
     chrome.runtime.sendMessage({mouse_log: info});
@@ -158,15 +151,4 @@ function getMousePos(ev) {
     return { 'x': x, 'y': y };
 }
 
-function formInfo(action_info, log_obj){
-    var obj = {};
-    obj.action = action_info;
-    obj.message = log_obj;
-    
-    var time_str = time_info();
-    var abs_time_str = (new Date()).getTime();
-    obj.time = time_str;
-    obj.abs_time = abs_time_str;
-    //console.log(info);
-    return obj;
-}
+
