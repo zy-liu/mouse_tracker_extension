@@ -6,7 +6,7 @@ $(function(){
                     $(this).addClass('thuir_hover');
                     base_link_message($(this).get(0), "HOVER");
                 }
-            })
+            });
 
         $('a')
             .click(function(){
@@ -15,7 +15,7 @@ $(function(){
                     $(this).addClass('thuir_click');
                     base_link_message($(this).get(0), "CLICK");
                 }
-            })
+            });
 });
 
 

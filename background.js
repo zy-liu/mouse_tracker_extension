@@ -14,10 +14,20 @@ var output_actions = annotation_actions;
 Context Menu
  */
 function radioOnClick(c_info, tab) {
+    var usefulness_score = 1;
+    switch (c_info.menuItemId) {
+        case l_1: usefulness_score = 1; break;
+        case l_2: usefulness_score = 2; break;
+        case l_3: usefulness_score = 3; break;
+        case l_4: usefulness_score = 4; break;
+        default: usefulness_score = 1;
+    }
+    
     var info = formInfo(
         "USEFULNESS_ANNOTATION",
         {
-            checked_item: c_info.meunItemId,
+            checked_item: c_info.menuItemId,
+            usefulness_score: usefulness_score,
             previous_checked_item: c_info.wasChecked,
         });
     info.site = tab.url;
@@ -43,10 +53,23 @@ var l_3 = chrome.contextMenus.create({
     "onclick": radioOnClick,
 });
 var l_4 = chrome.contextMenus.create({
-    "title": "very useful",
+    "title": "Very useful",
     "type": "radio",
     "parentId": parent,
     "onclick": radioOnClick,
+});
+/*
+Select Not useful at all for new web page
+ */
+var ctx_menu_cur_url = "";
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+    if (tab.url != ctx_menu_cur_url) {
+        ctx_menu_cur_url = tab.url;
+        chrome.contextMenus.update(l_2, {"checked": false});
+        chrome.contextMenus.update(l_3, {"checked": false});
+        chrome.contextMenus.update(l_4, {"checked": false});
+        chrome.contextMenus.update(l_1, {"checked": true});
+    }
 });
 
 /*
@@ -83,7 +106,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
 Execute click recording when page is updated
  */
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-    
     
     if(tab.url.match(/https:\/\/s\.taobao\.com\/*/)) {
         if(changeInfo.status == "complete") {
