@@ -46,7 +46,7 @@ $(function () {
         formInfo(
             "PAGE_START", 
             {
-                html: document.documentElement.innerHTML, 
+                html: document.documentElement.outerHTML, 
                 visible_elements: visible_elements,
             }
         )

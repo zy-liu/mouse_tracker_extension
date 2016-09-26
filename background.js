@@ -1,4 +1,4 @@
-var mouse_tracking_group_limit = 1;
+var mouse_tracking_group_limit = 100;
 var mouse_tracking_info_list = [];
 var current_url = "";
 var user = "default_user";
@@ -8,7 +8,7 @@ var page_actions = ['SEARCH_BEGIN', 'SEARCH_END', 'PAGE_START', 'PAGE_END', 'JUM
 var click_actions = ['CLICK', 'HOVER'];
 var mouse_actions = ['MOUSE_MOVE', 'SCROLL'];
 var annotation_actions = ['USEFULNESS_ANNOTATION'];
-var output_actions = annotation_actions;
+var output_actions = page_actions;
 
 /*
 Context Menu
@@ -166,7 +166,7 @@ Send sending queue to server
 function ajax_log_message(info_list) {
    //alert(encode_str + "\n");
     var log_url = "http://127.0.0.1:8000/extension_log/log/";
-    var log_url = "http://10.129.248.120:8000/extension_log/log/";
+    //var log_url = "http://10.129.248.120:8000/extension_log/log/";
     $.ajax({
         type: 'POST',
         dataType: 'json',
