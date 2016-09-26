@@ -88,10 +88,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
         details.tabId = sender.tab.id;
         chrome.pageCapture.saveAsMHTML(details, function(mhtmlData) {
             var reader = new window.FileReader();
-            reader.readAsDataURL(mhtmlData);
             reader.onloadend = function() {
                 info.message.mhtml = reader.result;
-            }
+            };
+            reader.readAsDataURL(mhtmlData);
         });
     }
 
