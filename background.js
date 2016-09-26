@@ -166,7 +166,7 @@ Send sending queue to server
 function ajax_log_message(info_list) {
    //alert(encode_str + "\n");
     var log_url = "http://127.0.0.1:8000/extension_log/log/";
-    //var log_url = "http://10.129.248.120:8000/extension_log/log/";
+    var log_url = "http://10.129.248.120:8000/extension_log/log/";
     $.ajax({
         type: 'POST',
         dataType: 'json',

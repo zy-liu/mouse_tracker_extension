@@ -31,14 +31,16 @@ $(function () {
     $(':visible').each(
         function (idx, e) {
             var rect = e.getBoundingClientRect();
-            var box = {
-                left: rect.left,
-                top: rect.top,
-                right: rect.right,
-                bottom: rect.bottom,
-                text: e.innerText,
-            };
-            visible_elements.push(box);
+            if (e.innerText != "") {
+                var box = {
+                    left: rect.left,
+                    top: rect.top,
+                    right: rect.right,
+                    bottom: rect.bottom,
+                    text: e.innerText,
+                };
+                visible_elements.push(box);
+            }
         }
     );
            
