@@ -1,4 +1,4 @@
-var mouse_tracking_group_limit = 100;
+var mouse_tracking_group_limit = 30;
 var mouse_tracking_info_list = [];
 var current_url = "";
 var user = "default_user";
@@ -8,11 +8,12 @@ var page_actions = ['SEARCH_BEGIN', 'SEARCH_END', 'PAGE_START', 'PAGE_END', 'JUM
 var click_actions = ['CLICK', 'HOVER'];
 var mouse_actions = ['MOUSE_MOVE', 'SCROLL'];
 var annotation_actions = ['USEFULNESS_ANNOTATION'];
-var output_actions = page_actions;
+var output_actions = page_actions+click_actions+mouse_actions+annotation_actions;
 
 /*
 Context Menu
  */
+var usefulness_dict = {};
 function radioOnClick(c_info, tab) {
     var usefulness_score = 1;
     switch (c_info.menuItemId) {
@@ -22,7 +23,7 @@ function radioOnClick(c_info, tab) {
         case l_4: usefulness_score = 4; break;
         default: usefulness_score = 1;
     }
-    
+     
     var info = formInfo(
         "USEFULNESS_ANNOTATION",
         {
@@ -31,7 +32,8 @@ function radioOnClick(c_info, tab) {
             previous_checked_item: c_info.wasChecked,
         });
     info.site = tab.url;
-    send_mouse_info(info)
+    send_mouse_info(info);
+    usefulness_dict[info.site] = usefulness_score;
 }
 var parent = chrome.contextMenus.create({"title": "Usefulness Annotation"});
 var l_1 = chrome.contextMenus.create({
@@ -58,19 +60,22 @@ var l_4 = chrome.contextMenus.create({
     "parentId": parent,
     "onclick": radioOnClick,
 });
+
 /*
-Select Not useful at all for new web page
+Select context menu items
  */
-var ctx_menu_cur_url = "";
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-    if (tab.url != ctx_menu_cur_url) {
-        ctx_menu_cur_url = tab.url;
-        chrome.contextMenus.update(l_2, {"checked": false});
-        chrome.contextMenus.update(l_3, {"checked": false});
-        chrome.contextMenus.update(l_4, {"checked": false});
-        chrome.contextMenus.update(l_1, {"checked": true});
+function set_selected(usefulness_score) {
+    chrome.contextMenus.update(l_1, {"checked": false});
+    chrome.contextMenus.update(l_2, {"checked": false});
+    chrome.contextMenus.update(l_3, {"checked": false});
+    chrome.contextMenus.update(l_4, {"checked": false});
+    switch (usefulness_score) {
+        case 1: chrome.contextMenus.update(l_1, {"checked": true}); break;
+        case 2: chrome.contextMenus.update(l_2, {"checked": true}); break;
+        case 3: chrome.contextMenus.update(l_3, {"checked": true}); break;
+        case 4: chrome.contextMenus.update(l_4, {"checked": true}); break;
     }
-});
+}
 
 /*
 Receive Message from content scripts
@@ -109,11 +114,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
     
     if(tab.url.match(/https:\/\/s\.taobao\.com\/*/)) {
         if(changeInfo.status == "complete") {
-            chrome.tabs.executeScript(null, {file: "content_link.js"});
+            chrome.tabs.executeScript(tabId, {file: "content_link.js"});
         }
     }
     else {
-        chrome.tabs.executeScript(null, {file: "content_link.js"});
+        chrome.tabs.executeScript(tabId, {file: "content_link.js"});
     }
     
 });
@@ -132,6 +137,7 @@ function send_mouse_info(info) {
     if (info.action == 'SEARCH_BEGIN') {
         user = info.message.user;
         task_url = info.message.task_url;
+        usefulness_dict = {};
     }
     info.user = user;
     info.task_url = task_url;
@@ -148,6 +154,18 @@ function send_mouse_info(info) {
         return;
     }
 
+    /*
+    set usefulness annotation context menus
+     */
+    if (info.action == "PAGE_START") {
+        usefulness_dict[info.site] = 1;
+        set_selected(1);
+    }
+    if (info.action == "JUMP_IN") {
+        console.log("JUMP_IN:"+info.site);
+        set_selected(usefulness_dict[info.site]);
+    }
+    
     
     if (task_url != "default_task_url") {
         mouse_tracking_info_list.push(info);

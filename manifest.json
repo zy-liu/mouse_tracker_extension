@@ -9,7 +9,8 @@
     "contextMenus",
     "tabs",
     "pageCapture",
-    "<all_urls>"
+    "http://*/",
+    "https://*/"
   ],
   
   "background": {
