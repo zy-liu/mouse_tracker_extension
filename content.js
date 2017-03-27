@@ -89,6 +89,9 @@ $(window).scroll(function () {
     var message = {};
     message.from = {x: mouse_tracking_pos_stamp.x, y: mouse_tracking_pos_stamp.y};
     message.to = {x: new_x, y: new_y};
+    
+    message.scroll_from = {x: mouse_tracking_scroll_stamp.scrollX, y: mouse_tracking_scroll_stamp.scrollY}
+    message.scroll_to = {x: c_left, y: c_top}
 
     mouse_tracking_scroll_stamp.scrollX = c_left;
     mouse_tracking_scroll_stamp.scrollY = c_top;
